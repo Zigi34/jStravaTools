@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.zigi</groupId>
-    <artifactId>jStravaTool</artifactId>
+    <artifactId>jStravaTools</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>jStravaTool</name>
-    <description>jStravaTool</description>
+    <name>jStravaTools</name>
+    <description>jStravaTools</description>
     <properties>
         <java.version>11</java.version>
     </properties>
