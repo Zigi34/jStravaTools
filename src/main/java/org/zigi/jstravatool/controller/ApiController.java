@@ -1,7 +1,5 @@
 package org.zigi.jstravatool.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -15,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.zigi.jstravatool.config.ApplicationConfiguration;
 import org.zigi.jstravatool.model.Athlete;
+import org.zigi.jstravatool.util.Constants;
 
 import java.io.InputStream;
 
@@ -31,7 +30,7 @@ public class ApiController {
         this.applicationConfiguration = applicationConfiguration;
     }
 
-    @GetMapping("/")
+    @GetMapping("/me")
     public Athlete getLoggerAthlete() {
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
             HttpUriRequest request = RequestBuilder.get()
@@ -41,9 +40,7 @@ public class ApiController {
                     .build();
             HttpResponse response = client.execute(request);
             try (InputStream stream = response.getEntity().getContent()) {
-                ObjectMapper mapper = new ObjectMapper();
-                mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                return mapper.readValue(stream, Athlete.class);
+                return Constants.MAPPER.readValue(stream, Athlete.class);
             } catch(Exception e) {
                 LOG.error("Fail read response stream", e);
             }
