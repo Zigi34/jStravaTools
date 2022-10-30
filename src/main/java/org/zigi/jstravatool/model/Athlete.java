@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Athlete {
     private Long id;
@@ -23,10 +24,10 @@ public class Athlete {
     private Boolean summit;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
     @JsonProperty("created_at")
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
     @JsonProperty("updated_at")
-    private LocalDate updatedAt;
+    private LocalDateTime updatedAt;
     @JsonProperty("badge_type_id")
     private Integer badgeTypeId;
     private Double weight;
@@ -130,19 +131,19 @@ public class Athlete {
         this.summit = summit;
     }
 
-    public LocalDate getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDate createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDate getUpdatedAt() {
+    public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDate updatedAt) {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
