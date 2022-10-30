@@ -1,5 +1,6 @@
 package org.zigi.jstravatool.controller;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -12,7 +13,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.zigi.jstravatool.JStravaToolApplication;
 import org.zigi.jstravatool.config.ApplicationConfiguration;
 import org.zigi.jstravatool.model.Athlete;
 
@@ -20,6 +20,7 @@ import java.io.InputStream;
 
 
 @RestController
+@RequestMapping("/api")
 public class ApiController {
 
     private final ApplicationConfiguration applicationConfiguration;
@@ -27,13 +28,11 @@ public class ApiController {
     private static final Logger LOG = LogManager.getLogger(ApiController.class);
 
     public ApiController(ApplicationConfiguration applicationConfiguration) {
-        LOG.info("TEEEEEEST");
         this.applicationConfiguration = applicationConfiguration;
     }
 
-    @GetMapping("/api")
+    @GetMapping("/")
     public Athlete getLoggerAthlete() {
-        LOG.info("API");
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
             HttpUriRequest request = RequestBuilder.get()
                     .setUri("https://www.strava.com/api/v3/athlete")
@@ -43,6 +42,7 @@ public class ApiController {
             HttpResponse response = client.execute(request);
             try (InputStream stream = response.getEntity().getContent()) {
                 ObjectMapper mapper = new ObjectMapper();
+                mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 return mapper.readValue(stream, Athlete.class);
             } catch(Exception e) {
                 LOG.error("Fail read response stream", e);
@@ -50,7 +50,6 @@ public class ApiController {
         } catch(Exception e) {
             LOG.error("Fail request", e);
         }
-        LOG.info("NULL");
         return null;
     }
 }
