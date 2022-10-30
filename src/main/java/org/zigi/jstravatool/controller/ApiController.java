@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.zigi.jstravatool.JStravaToolApplication;
 import org.zigi.jstravatool.config.ApplicationConfiguration;
 import org.zigi.jstravatool.model.Athlete;
 
@@ -22,14 +23,16 @@ public class ApiController {
 
     private final ApplicationConfiguration applicationConfiguration;
 
-    private final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LogManager.getLogger(ApiController.class);
 
     public ApiController(ApplicationConfiguration applicationConfiguration) {
+        LOG.info("TEEEEEEST");
         this.applicationConfiguration = applicationConfiguration;
     }
 
     @GetMapping(name = "/api")
     public Athlete getLoggerAthlete() {
+        LOG.info("API");
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
             HttpUriRequest request = RequestBuilder.get()
                     .setUri("https://www.strava.com/api/v3/athlete")
@@ -46,6 +49,7 @@ public class ApiController {
         } catch(Exception e) {
             LOG.error("Fail request", e);
         }
+        LOG.info("NULL");
         return null;
     }
 }

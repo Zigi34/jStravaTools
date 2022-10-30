@@ -11,10 +11,10 @@ public class JStravaToolApplication {
 
     private static final Logger LOG = LogManager.getLogger(JStravaToolApplication.class);
     public static void main(String[] args) {
-        SpringApplication.run(JStravaToolApplication.class, args);
-
         LOG.info("Info level log message");
         LOG.debug("Debug level log message");
         LOG.error("Error level log message");
+
+        SpringApplication.run(JStravaToolApplication.class, args);
     }
 }
