@@ -10,6 +10,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.zigi.jstravatool.JStravaToolApplication;
 import org.zigi.jstravatool.config.ApplicationConfiguration;
@@ -30,7 +31,7 @@ public class ApiController {
         this.applicationConfiguration = applicationConfiguration;
     }
 
-    @GetMapping(name = "/api")
+    @GetMapping("/api")
     public Athlete getLoggerAthlete() {
         LOG.info("API");
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
