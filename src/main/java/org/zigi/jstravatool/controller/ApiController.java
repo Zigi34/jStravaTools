@@ -10,17 +10,14 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.zigi.jstravatool.config.ApplicationConfiguration;
 import org.zigi.jstravatool.model.Athlete;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 
 @RestController
-@RequestMapping(name = "/api")
 public class ApiController {
 
     private final ApplicationConfiguration applicationConfiguration;
@@ -31,7 +28,7 @@ public class ApiController {
         this.applicationConfiguration = applicationConfiguration;
     }
 
-    @GetMapping(name = "/")
+    @GetMapping(name = "/api")
     public Athlete getLoggerAthlete() {
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
             HttpUriRequest request = RequestBuilder.get()
