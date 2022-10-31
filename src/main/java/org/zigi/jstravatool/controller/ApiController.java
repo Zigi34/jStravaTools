@@ -55,7 +55,7 @@ public class ApiController {
             //redirect to authorize and generate access token
             HttpHeaders headers = new HttpHeaders();
             headers.add("Location", String.format("http://194.182.70.42/jStravaTools/api/me?accessToken=%s", tokenResponse.getAccessToken()));
-            return new ResponseEntity<>(headers, HttpStatus.OK);
+            return new ResponseEntity<>(headers, HttpStatus.PERMANENT_REDIRECT);
         }
 
         // empty access token
@@ -65,7 +65,7 @@ public class ApiController {
             //redirect to authorize and generate access token
             HttpHeaders headers = new HttpHeaders();
             headers.add("Location", String.format("http://194.182.70.42/jStravaTools/oauth2/authorize?redirectUri=%s", redirectUri));
-            return new ResponseEntity<>(headers, HttpStatus.OK);
+            return new ResponseEntity<>(headers, HttpStatus.PERMANENT_REDIRECT);
         }
 
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
