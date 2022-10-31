@@ -20,11 +20,14 @@ import org.zigi.jstravatool.model.Athlete;
 import org.zigi.jstravatool.model.TokenResponse;
 import org.zigi.jstravatool.util.Constants;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -89,7 +92,6 @@ public class ApiController {
     private TokenResponse generateToken(String code) {
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
             HttpPost post = new HttpPost("https://www.strava.com/api/v3/oauth/token");
-            post.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
 
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair("client_id", String.valueOf(applicationConfiguration.getClientId())));
@@ -100,6 +102,8 @@ public class ApiController {
 
             HttpResponse response = client.execute(post);
             try (InputStream stream = response.getEntity().getContent()) {
+                String text = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).lines().collect(Collectors.joining("\n"));
+                LOG.info(text);
                 return Constants.MAPPER.readValue(stream, TokenResponse.class);
             } catch(Exception e) {
                 LOG.error("Fail read response stream", e);

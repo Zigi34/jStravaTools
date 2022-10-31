@@ -6,8 +6,8 @@ public class TokenResponse {
     @JsonProperty("token_type")
     private String tokenType;
 
-    @JsonProperty("expired_at")
-    private Long expiredAt;
+    @JsonProperty("expires_at")
+    private Long expiresAt;
 
     @JsonProperty("expires_in")
     private Long expiresIn;
@@ -26,12 +26,12 @@ public class TokenResponse {
         this.tokenType = tokenType;
     }
 
-    public Long getExpiredAt() {
-        return expiredAt;
+    public Long getExpiresAt() {
+        return expiresAt;
     }
 
-    public void setExpiredAt(Long expiredAt) {
-        this.expiredAt = expiredAt;
+    public void setExpiresAt(Long expiredAt) {
+        this.expiresAt = expiresAt;
     }
 
     public Long getExpiresIn() {
