@@ -13,11 +13,25 @@ public class ApplicationConfiguration {
     @Value("${clientId}")
     private String clientId;
 
+    @Value("${clientSecret}")
+    private String clientSecret;
+
+    @Value("${refreshToken}")
+    private String refreshToken;
+
     public String getAccessToken() {
         return accessToken;
     }
 
     public String getClientId() {
         return clientId;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
     }
 }
