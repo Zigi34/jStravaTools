@@ -3,11 +3,10 @@ package org.zigi.jstravatool.controller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.zigi.jstravatool.config.ApplicationConfiguration;
 
 @Controller
@@ -22,16 +21,16 @@ public class OAuthController {
     }
 
     @GetMapping("/authorize")
-    public ModelAndView authorize(@RequestParam("redirectUri") String redirectUri, ModelMap model) {
+    public String authorize(@RequestParam("redirectUri") String redirectUri, RedirectAttributes redirectAttributes) {
         LOG.info("redirectUri: " + redirectUri);
-        model.addAttribute("redirect_uri", redirectUri);
+        redirectAttributes.addAttribute("redirect_uri", redirectUri);
 
         LOG.info("client ID: " + applicationConfiguration.getClientId());
-        model.addAttribute("client_id", applicationConfiguration.getClientId());
+        redirectAttributes.addAttribute("client_id", applicationConfiguration.getClientId());
 
-        model.addAttribute("response_type", "code");
-        model.addAttribute("approval_prompt", "force");
-        model.addAttribute("scope", "read,read_all,profile:read_all,activity:read_all");
-        return new ModelAndView("forward:https://www.strava.com/oauth/authorize", model);
+        redirectAttributes.addAttribute("response_type", "code");
+        redirectAttributes.addAttribute("approval_prompt", "force");
+        redirectAttributes.addAttribute("scope", "read,read_all,profile:read_all,activity:read_all");
+        return "redirect:https://www.strava.com/oauth/authorize";
     }
 }
