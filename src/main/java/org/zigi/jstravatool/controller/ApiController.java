@@ -20,14 +20,11 @@ import org.zigi.jstravatool.model.Athlete;
 import org.zigi.jstravatool.model.TokenResponse;
 import org.zigi.jstravatool.util.Constants;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @RestController
@@ -47,10 +44,6 @@ public class ApiController {
     public ResponseEntity<Athlete> getLoggerAthlete(@RequestParam(name = "code", required = false) String code,
                                                     @RequestParam(name = "scope", required = false) String scope,
                                                     @RequestParam(name = "accessToken", required = false) String accessToken) {
-        LOG.info("Code: " + code);
-        LOG.info("Scope: " + scope);
-        LOG.info("AccessToken:" + accessToken);
-
         // after authorize
         if(code != null) {
             TokenResponse tokenResponse = generateToken(code);

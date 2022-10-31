@@ -3,7 +3,6 @@ package org.zigi.jstravatool.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Athlete {
