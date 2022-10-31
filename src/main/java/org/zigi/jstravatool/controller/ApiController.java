@@ -54,6 +54,7 @@ public class ApiController {
         // after authorize
         if(code != null) {
             TokenResponse tokenResponse = generateToken(code);
+            LOG.info(tokenResponse.toString());
 
             //redirect to authorize and generate access token
             HttpHeaders headers = new HttpHeaders();
@@ -102,8 +103,6 @@ public class ApiController {
 
             HttpResponse response = client.execute(post);
             try (InputStream stream = response.getEntity().getContent()) {
-                String text = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).lines().collect(Collectors.joining("\n"));
-                LOG.info(text);
                 return Constants.MAPPER.readValue(stream, TokenResponse.class);
             } catch(Exception e) {
                 LOG.error("Fail read response stream", e);
