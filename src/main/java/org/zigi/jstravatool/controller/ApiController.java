@@ -140,7 +140,7 @@ public class ApiController {
 
     @ResponseBody
     @GetMapping("/photos")
-    public ResponseEntity<List<ActivityPhoto>> photos(@RequestParam(name = "code", required = false) String code,
+    public ResponseEntity<List<String>> photos(@RequestParam(name = "code", required = false) String code,
                                                       @RequestParam(name = "scope", required = false) String scope,
                                                       @RequestParam(name = "accessToken", required = false) String accessToken) {
         // after authorize
@@ -164,14 +164,16 @@ public class ApiController {
             return new ResponseEntity<>(headers, HttpStatus.PERMANENT_REDIRECT);
         }
 
-        List<ActivityPhoto> photos = new ArrayList<>();
+        List<String> photos = new ArrayList<>();
         List<SummaryActivity> activities = stravaService.activities(accessToken, null, null, 1, 200);
         if(activities != null) {
             for(SummaryActivity activity : activities) {
                 if(activity.getTotalPhotoCount() != null && activity.getTotalPhotoCount() > 0) {
-                    List<ActivityPhoto> activityPhotos = stravaService.photos(accessToken, activity.getId());
-                    if(activityPhotos != null) {
-                        photos.addAll(activityPhotos);
+                    DetailedActivity detail = stravaService.activity(accessToken, activity.getId(), true);
+                    if(detail != null && detail.getPhotos() != null && detail.getPhotos().getPrimary() != null && detail.getPhotos().getPrimary().getUrls() != null) {
+                        for(String key : detail.getPhotos().getPrimary().getUrls().keySet()) {
+                            photos.add(detail.getPhotos().getPrimary().getUrls().get(key));
+                        }
                     }
                 }
             }
