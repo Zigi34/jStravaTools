@@ -168,7 +168,7 @@ public class ApiController {
         List<SummaryActivity> activities = stravaService.activities(accessToken, null, null, 1, 200);
         if(activities != null) {
             for(SummaryActivity activity : activities) {
-                if(activity.getPhotoCount() != null && activity.getPhotoCount() > 0) {
+                if(activity.getTotalPhotoCount() != null && activity.getTotalPhotoCount() > 0) {
                     List<ActivityPhoto> activityPhotos = stravaService.photos(accessToken, activity.getId());
                     if(activityPhotos != null) {
                         photos.addAll(activityPhotos);
