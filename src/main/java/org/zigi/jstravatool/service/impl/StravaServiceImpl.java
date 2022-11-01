@@ -13,6 +13,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Service;
 import org.zigi.jstravatool.config.ApplicationConfiguration;
 import org.zigi.jstravatool.model.SummaryActivity;
 import org.zigi.jstravatool.model.TokenResponse;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class StravaServiceImpl implements StravaService {
 
     private static final Logger LOG = LogManager.getLogger(StravaServiceImpl.class);
