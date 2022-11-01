@@ -137,6 +137,6 @@ public class ApiController {
             return new ResponseEntity<>(headers, HttpStatus.PERMANENT_REDIRECT);
         }
 
-        return ResponseEntity.ok(stravaService.athleteActivity(accessToken, id, false));
+        return ResponseEntity.ok(stravaService.athleteActivity(accessToken, id, true));
     }
 }
