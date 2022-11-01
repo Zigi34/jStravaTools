@@ -81,7 +81,7 @@ public class StravaServiceImpl implements StravaService {
     @Override
     public DetailedActivity athleteActivity(String accessToken, Long id, Boolean includeAllEfforts) {
         try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
-            HttpGet get = new HttpGet(String.format("https://www.strava.com/api/v3/athlete/activities/%s", id));
+            HttpGet get = new HttpGet(String.format("https://www.strava.com/api/v3/activities/%s", id));
             get.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
             get.setHeader(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", accessToken));
 
