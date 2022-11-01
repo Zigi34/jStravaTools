@@ -21,11 +21,15 @@ import org.zigi.jstravatool.model.TokenResponse;
 import org.zigi.jstravatool.service.StravaService;
 import org.zigi.jstravatool.util.Constants;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StravaServiceImpl implements StravaService {
@@ -91,7 +95,9 @@ public class StravaServiceImpl implements StravaService {
 
             HttpResponse response = client.execute(get);
             try (InputStream stream = response.getEntity().getContent()) {
-                return Constants.MAPPER.readValue(stream, DetailedActivity.class);
+                String text = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).lines().collect(Collectors.joining("\n"));
+                LOG.info(text);
+                return Constants.MAPPER.readValue(text, DetailedActivity.class);
             } catch(Exception e) {
                 LOG.error("Fail read response stream", e);
             }

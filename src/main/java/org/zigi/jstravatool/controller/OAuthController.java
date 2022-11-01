@@ -22,7 +22,7 @@ public class OAuthController {
         redirectAttributes.addAttribute("client_id", applicationConfiguration.getClientId());
         redirectAttributes.addAttribute("response_type", "code");
         redirectAttributes.addAttribute("approval_prompt", "force");
-        redirectAttributes.addAttribute("scope", "read,read_all,profile:read_all,activity:read_all");
+        redirectAttributes.addAttribute("scope", "read,read_all,profile:read_all,activity:read,activity:read_all");
         return "redirect:https://www.strava.com/oauth/authorize";
     }
 
@@ -32,7 +32,7 @@ public class OAuthController {
         redirectAttributes.addAttribute("client_id", applicationConfiguration.getClientId());
         redirectAttributes.addAttribute("response_type", "code");
         redirectAttributes.addAttribute("approval_prompt", "force");
-        redirectAttributes.addAttribute("scope", "read,read_all,profile:read_all,activity:read_all");
+        redirectAttributes.addAttribute("scope", "read,read_all,profile:read_all,activity:read,activity:read_all");
         return "redirect:https://www.strava.com/oauth/authorize";
     }
 }
