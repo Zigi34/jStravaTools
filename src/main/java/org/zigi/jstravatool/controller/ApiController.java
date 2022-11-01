@@ -11,16 +11,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.zigi.jstravatool.model.Athlete;
-import org.zigi.jstravatool.model.DetailedActivity;
-import org.zigi.jstravatool.model.SummaryActivity;
-import org.zigi.jstravatool.model.TokenResponse;
+import org.zigi.jstravatool.model.*;
 import org.zigi.jstravatool.service.StravaService;
 import org.zigi.jstravatool.util.Constants;
 
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -82,7 +80,7 @@ public class ApiController {
 
     @ResponseBody
     @GetMapping("/activities")
-    public ResponseEntity<List<SummaryActivity>> athleteActivities(@RequestParam(name = "code", required = false) String code,
+    public ResponseEntity<List<SummaryActivity>> activities(@RequestParam(name = "code", required = false) String code,
                                                                   @RequestParam(name = "scope", required = false) String scope,
                                                                   @RequestParam(name = "accessToken", required = false) String accessToken) {
         // after authorize
@@ -106,12 +104,12 @@ public class ApiController {
             return new ResponseEntity<>(headers, HttpStatus.PERMANENT_REDIRECT);
         }
 
-        return ResponseEntity.ok(stravaService.athleteActivities(accessToken, null, null, 1, 30));
+        return ResponseEntity.ok(stravaService.activities(accessToken, null, null, 1, 30));
     }
 
     @ResponseBody
     @GetMapping("/activities/{id}")
-    public ResponseEntity<DetailedActivity> athleteActivities(
+    public ResponseEntity<DetailedActivity> activity(
             @PathVariable(value = "id", required = true) Long id,
             @RequestParam(name = "code", required = false) String code, @RequestParam(name = "scope", required = false) String scope,
             @RequestParam(name = "accessToken", required = false) String accessToken) {
@@ -137,6 +135,48 @@ public class ApiController {
             return new ResponseEntity<>(headers, HttpStatus.PERMANENT_REDIRECT);
         }
 
-        return ResponseEntity.ok(stravaService.athleteActivity(accessToken, id, true));
+        return ResponseEntity.ok(stravaService.activity(accessToken, id, true));
+    }
+
+    @ResponseBody
+    @GetMapping("/photos")
+    public ResponseEntity<List<ActivityPhoto>> photos(@RequestParam(name = "code", required = false) String code,
+                                                      @RequestParam(name = "scope", required = false) String scope,
+                                                      @RequestParam(name = "accessToken", required = false) String accessToken) {
+        // after authorize
+        if(code != null) {
+            TokenResponse tokenResponse = stravaService.generateToken(code);
+            LOG.info(tokenResponse.toString());
+
+            //redirect to authorize and generate access token
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Location", String.format("http://194.182.70.42/jStravaTools/api/photos?accessToken=%s", tokenResponse.getAccessToken()));
+            return new ResponseEntity<>(headers, HttpStatus.PERMANENT_REDIRECT);
+        }
+
+        // empty access token
+        if(accessToken == null || accessToken.isEmpty()) {
+            String redirectUri = URLEncoder.encode("http://194.182.70.42/jStravaTools/api/photos", StandardCharsets.UTF_8);
+
+            //redirect to authorize and generate access token
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Location", String.format("http://194.182.70.42/jStravaTools/oauth2/authorize?redirectUri=%s", redirectUri));
+            return new ResponseEntity<>(headers, HttpStatus.PERMANENT_REDIRECT);
+        }
+
+        List<ActivityPhoto> photos = new ArrayList<>();
+        List<SummaryActivity> activities = stravaService.activities(accessToken, null, null, 1, 200);
+        if(activities != null) {
+            for(SummaryActivity activity : activities) {
+                if(activity.getPhotoCount() != null && activity.getPhotoCount() > 0) {
+                    List<ActivityPhoto> activityPhotos = stravaService.photos(accessToken, activity.getId());
+                    if(activityPhotos != null) {
+                        photos.addAll(activityPhotos);
+                    }
+                }
+            }
+        }
+
+        return ResponseEntity.ok(photos);
     }
 }
