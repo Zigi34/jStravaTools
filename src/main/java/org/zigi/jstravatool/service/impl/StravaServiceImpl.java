@@ -1,0 +1,97 @@
+package org.zigi.jstravatool.service.impl;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpHeaders;
+import org.zigi.jstravatool.config.ApplicationConfiguration;
+import org.zigi.jstravatool.model.SummaryActivity;
+import org.zigi.jstravatool.model.TokenResponse;
+import org.zigi.jstravatool.service.StravaService;
+import org.zigi.jstravatool.util.Constants;
+
+import java.io.InputStream;
+import java.net.URI;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+public class StravaServiceImpl implements StravaService {
+
+    private static final Logger LOG = LogManager.getLogger(StravaServiceImpl.class);
+
+    private final ApplicationConfiguration applicationConfiguration;
+
+    public StravaServiceImpl(ApplicationConfiguration applicationConfiguration) {
+        this.applicationConfiguration = applicationConfiguration;
+    }
+
+    @Override
+    public List<SummaryActivity> athleteActivities(String accessToken, LocalDateTime before, LocalDateTime after, Integer page, Integer perPage) {
+        try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
+            HttpGet get = new HttpGet("https://www.strava.com/api/v3/athlete/activities");
+            get.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+            get.setHeader(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", accessToken));
+
+            List nameValuePairs = new ArrayList();
+            if(before != null) {
+                nameValuePairs.add(new BasicNameValuePair("before", String.valueOf(before)));
+            }
+            if(after != null) {
+                nameValuePairs.add(new BasicNameValuePair("after", String.valueOf(after)));
+            }
+            if(page != null) {
+                nameValuePairs.add(new BasicNameValuePair("page", String.valueOf(page)));
+            }
+            if(perPage != null) {
+                nameValuePairs.add(new BasicNameValuePair("per_page", String.valueOf(perPage)));
+            }
+
+            URI uri = new URIBuilder(get.getURI()).addParameters(nameValuePairs).build();
+            get.setURI(uri);
+
+            HttpResponse response = client.execute(get);
+            try (InputStream stream = response.getEntity().getContent()) {
+                return Constants.MAPPER.readValue(stream, new TypeReference<List<SummaryActivity>>() {});
+            } catch(Exception e) {
+                LOG.error("Fail read response stream", e);
+            }
+        } catch(Exception e) {
+            LOG.error("Fail request", e);
+        }
+        return null;
+    }
+
+    @Override
+    public TokenResponse generateToken(String code) {
+        try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
+            HttpPost post = new HttpPost("https://www.strava.com/api/v3/oauth/token");
+
+            List<NameValuePair> params = new ArrayList<>();
+            params.add(new BasicNameValuePair("client_id", String.valueOf(applicationConfiguration.getClientId())));
+            params.add(new BasicNameValuePair("client_secret", applicationConfiguration.getClientSecret()));
+            params.add(new BasicNameValuePair("code", code));
+            params.add(new BasicNameValuePair("grant_type", "authorization_code"));
+            post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+
+            HttpResponse response = client.execute(post);
+            try (InputStream stream = response.getEntity().getContent()) {
+                return Constants.MAPPER.readValue(stream, TokenResponse.class);
+            } catch(Exception e) {
+                LOG.error("Fail read response stream", e);
+            }
+        } catch(Exception e) {
+            LOG.error("Fail request", e);
+        }
+        return null;
+    }
+}
