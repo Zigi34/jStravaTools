@@ -11,8 +11,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.zigi.jstravatool.config.ApplicationConfiguration;
 import org.zigi.jstravatool.model.Athlete;
+import org.zigi.jstravatool.model.DetailedActivity;
 import org.zigi.jstravatool.model.SummaryActivity;
 import org.zigi.jstravatool.model.TokenResponse;
 import org.zigi.jstravatool.service.StravaService;
@@ -28,14 +28,11 @@ import java.util.List;
 @RequestMapping("/api")
 public class ApiController {
 
-    private final ApplicationConfiguration applicationConfiguration;
-
     private final StravaService stravaService;
 
     private static final Logger LOG = LogManager.getLogger(ApiController.class);
 
-    public ApiController(ApplicationConfiguration applicationConfiguration, StravaService stravaService) {
-        this.applicationConfiguration = applicationConfiguration;
+    public ApiController(StravaService stravaService) {
         this.stravaService = stravaService;
     }
 
@@ -110,5 +107,36 @@ public class ApiController {
         }
 
         return ResponseEntity.ok(stravaService.athleteActivities(accessToken, null, null, 1, 30));
+    }
+
+    @ResponseBody
+    @GetMapping("/activities/{id}")
+    public ResponseEntity<DetailedActivity> athleteActivities(
+            @PathVariable(value = "id", required = true) Long id,
+            @RequestParam(name = "code", required = false) String code, @RequestParam(name = "scope", required = false) String scope,
+            @RequestParam(name = "accessToken", required = false) String accessToken) {
+
+        // after authorize
+        if(code != null) {
+            TokenResponse tokenResponse = stravaService.generateToken(code);
+            LOG.info(tokenResponse.toString());
+
+            //redirect to authorize and generate access token
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Location", String.format("http://194.182.70.42/jStravaTools/api/activities/%s?accessToken=%s", id, tokenResponse.getAccessToken()));
+            return new ResponseEntity<>(headers, HttpStatus.PERMANENT_REDIRECT);
+        }
+
+        // empty access token
+        if(accessToken == null || accessToken.isEmpty()) {
+            String redirectUri = URLEncoder.encode("http://194.182.70.42/jStravaTools/api/activities/" + id, StandardCharsets.UTF_8);
+
+            //redirect to authorize and generate access token
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Location", String.format("http://194.182.70.42/jStravaTools/oauth2/authorize?redirectUri=%s", redirectUri));
+            return new ResponseEntity<>(headers, HttpStatus.PERMANENT_REDIRECT);
+        }
+
+        return ResponseEntity.ok(stravaService.athleteActivity(accessToken, id, false));
     }
 }

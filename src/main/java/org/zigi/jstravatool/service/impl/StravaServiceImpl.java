@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.zigi.jstravatool.config.ApplicationConfiguration;
+import org.zigi.jstravatool.model.DetailedActivity;
 import org.zigi.jstravatool.model.SummaryActivity;
 import org.zigi.jstravatool.model.TokenResponse;
 import org.zigi.jstravatool.service.StravaService;
@@ -64,6 +65,33 @@ public class StravaServiceImpl implements StravaService {
             HttpResponse response = client.execute(get);
             try (InputStream stream = response.getEntity().getContent()) {
                 return Constants.MAPPER.readValue(stream, new TypeReference<List<SummaryActivity>>() {});
+            } catch(Exception e) {
+                LOG.error("Fail read response stream", e);
+            }
+        } catch(Exception e) {
+            LOG.error("Fail request", e);
+        }
+        return null;
+    }
+
+    @Override
+    public DetailedActivity athleteActivity(String accessToken, Long id, Boolean includeAllEfforts) {
+        try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
+            HttpGet get = new HttpGet(String.format("https://www.strava.com/api/v3/athlete/activities/%s", id));
+            get.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+            get.setHeader(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", accessToken));
+
+            List nameValuePairs = new ArrayList();
+            if(includeAllEfforts != null) {
+                nameValuePairs.add(new BasicNameValuePair("include_all_efforts", String.valueOf(includeAllEfforts)));
+            }
+
+            URI uri = new URIBuilder(get.getURI()).addParameters(nameValuePairs).build();
+            get.setURI(uri);
+
+            HttpResponse response = client.execute(get);
+            try (InputStream stream = response.getEntity().getContent()) {
+                return Constants.MAPPER.readValue(stream, DetailedActivity.class);
             } catch(Exception e) {
                 LOG.error("Fail read response stream", e);
             }
